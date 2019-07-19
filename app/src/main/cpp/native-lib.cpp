@@ -7,32 +7,6 @@
 
 using namespace cv;
 
-ANativeWindow *mWindow;
-
-
-
-
-
-
-
-
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_zhangzd_facedetection_OpenCVJni_native_1setSurface(JNIEnv *env, jobject instance,
-                                                                    jobject surface) {
-    if (mWindow) {
-        ANativeWindow_release(mWindow);
-        mWindow = 0;
-    }
-
-    //创建显示surface的window
-    mWindow = ANativeWindow_fromSurface(env, surface);
-}
-
-
-
-
-
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_example_zhangzd_beautymaster_OpenCVJni_native_1init(JNIEnv *env, jobject instance,
                                                              jstring path_, jstring seetPath_) {
@@ -40,7 +14,7 @@ Java_com_example_zhangzd_beautymaster_OpenCVJni_native_1init(JNIEnv *env, jobjec
     const char *seetPath = env->GetStringUTFChars(seetPath_, 0);
 
     //初始化检测器和跟踪器
-    FaceTrack *faceTrack = new FaceTrack(path);
+    FaceTrack *faceTrack = new FaceTrack(path,seetPath);
 
     env->ReleaseStringUTFChars(path_, path);
     env->ReleaseStringUTFChars(seetPath_, seetPath);
@@ -96,9 +70,11 @@ Java_com_example_zhangzd_beautymaster_OpenCVJni_native_1detector(JNIEnv *env, jo
     equalizeHist(gray, gray);
 
 
-    faceTrack->detector(gray);
+    //获取人脸关键点信息
+    vector<Rect2f> rects = faceTrack->detector(gray);
 
-
+    // 反射组装Face对象返回给Java层
+    jclass clazz = env->FindClass("com/example/zhangzd/beautymaster/face/Face");
 
 
     src.release();
@@ -107,4 +83,5 @@ Java_com_example_zhangzd_beautymaster_OpenCVJni_native_1detector(JNIEnv *env, jo
 
 
     env->ReleaseByteArrayElements(data_, data, 0);
+    return NULL;
 }

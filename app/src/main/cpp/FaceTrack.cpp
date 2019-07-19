@@ -3,30 +3,23 @@
 //
 
 #include "FaceTrack.h"
+#include "macro.h"
 
-FaceTrack::FaceTrack(const char *path) {
+FaceTrack::FaceTrack(const char *path, const char *seeta) {
 
     //创建跟踪器和检测器
-
-    //创建
-    Ptr<CascadeClassifier> classifier = makePtr<CascadeClassifier>(path);
-
     //创建检测器
-    Ptr<CascadeDetectorAdapter> mainDetector = makePtr<CascadeDetectorAdapter>(classifier);
-
-
-    //    跟踪器
-    //智能指针
-    Ptr<CascadeClassifier> classifier1 = makePtr<CascadeClassifier>(path);
-
+    Ptr<CascadeDetectorAdapter> mainDetector = makePtr<CascadeDetectorAdapter>(makePtr<CascadeClassifier>(path));
 //创建检测器    classifier RecyclerView    CascadeDetectorAdapter  适配器
-    Ptr<CascadeDetectorAdapter> trackingDetector = makePtr<CascadeDetectorAdapter>(classifier1);
+    Ptr<CascadeDetectorAdapter> trackingDetector = makePtr<CascadeDetectorAdapter>(makePtr<CascadeClassifier>(path));
 
 
     DetectionBasedTracker::Parameters DetectorParams;
 //    tracker  含有两个对象 检测器 跟踪器
     tracker = new DetectionBasedTracker(mainDetector, trackingDetector, DetectorParams);
 //    tracker->run();
+
+    faceAlignment = makePtr<seeta::FaceAlignment>(seeta);
 
 }
 
@@ -35,10 +28,55 @@ void FaceTrack::startTracking() {
     tracker->run();
 }
 
-//人脸监测
-void FaceTrack::detector(Mat src) {
-    tracker->process(src);
-    vector<Rect> faces;
-    tracker->getObjects(faces);
 
+//人脸监测
+vector<Rect2f> FaceTrack::detector(Mat src) {
+    vector<Rect> faces;
+    vector<Rect2f> rects;
+//    开始检测
+    tracker->process(src);
+//    获取结果
+    tracker->getObjects(faces);
+    if (faces.size()) {
+//        遍历多个人脸  对每一个人眼进行定位   放大
+        Rect face = faces[0];
+//        人脸的区域
+        rects.push_back(Rect2f(face.x, face.y, face.width, face.height));
+        //关键点定位
+        //保存5个关键点的坐标
+        // 0:左眼  1:右眼  2:鼻头  3:嘴巴左  4:嘴巴右
+        seeta::FacialLandmark points[5];
+        //图像数据
+        seeta::ImageData image_data(src.cols,src.rows);
+        image_data.data = src.data;
+        //指定人脸部位
+        seeta::FaceInfo faceInfo;
+        seeta::Rect bbox;
+        bbox.x = face.x;
+        bbox.y  = face.y;
+        bbox.width = face.width;
+        bbox.height = face.height;
+        faceInfo.bbox = bbox;
+        faceAlignment->PointDetectLandmarks(image_data, faceInfo, points);
+
+        for (int i = 0; i < 5; ++i) {
+            //把点放入返回的集合
+            rects.push_back(Rect2f(points[i].x,points[i].y,0,0));
+        }
+    }
+
+//    for(int i = 0; rects.size(); i++) {
+//        LOGE("======= %d",rects.pu);
+//    }
+    vector<Rect2f>::iterator it = rects.begin();
+    // vector<int>::const_iterator iter=v.begin();
+    for(; it != rects.end(); ++it)
+    {
+        cout<<(*it)<<" ";
+        LOGE("检测人脸%d%d",(*it).x,(*it).y);
+    }
+
+    LOGE("检测人脸%d",faces.size());
+
+    return rects;
 }

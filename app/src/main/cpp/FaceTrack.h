@@ -6,6 +6,8 @@
 #define BEAUTYMASTER_FACETRACK_H
 
 #include "include/opencv2/opencv.hpp"
+#include <vector>
+#include "face_alignment.h"
 
 using namespace cv;
 using namespace std;
@@ -38,15 +40,16 @@ class FaceTrack {
 
 
 public:
-    FaceTrack(const char *path);
+    FaceTrack(const char *path, const char *seeta);
 
 
     void startTracking();
 
-    void detector(Mat mat);
+    vector<Rect2f> detector(Mat mat);
 
 private:
     DetectionBasedTracker *tracker = 0;
+    Ptr<seeta::FaceAlignment> faceAlignment;
 
 };
 

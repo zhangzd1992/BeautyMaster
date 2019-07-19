@@ -28,6 +28,7 @@ public class GLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
     private ScreenFilter mScreenFilter;
     private OpenCVJni openCVJni;
     File lbpcascade_frontalface = new File(Environment.getExternalStorageDirectory(), "lbpcascade_frontalface.xml");
+    File seeta_fa = new File(Environment.getExternalStorageDirectory(), "seeta_fa_v1.1.bin");
     GLRender(GLView glView) {
         this.mView = glView;
         init();
@@ -35,11 +36,12 @@ public class GLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
 
     private void init() {
         Utils.copyAssets2SdCard(mView.getContext(),"lbpcascade_frontalface.xml",lbpcascade_frontalface.getAbsolutePath());
+        Utils.copyAssets2SdCard(mView.getContext(),"seeta_fa_v1.1.bin",seeta_fa.getAbsolutePath());
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        mCameraHelper = new CameraHelper(Camera.CameraInfo.CAMERA_FACING_BACK);
+        mCameraHelper = new CameraHelper(Camera.CameraInfo.CAMERA_FACING_FRONT);
         //创建OpenGL纹理，并获取纹理ID
         GLES20.glGenTextures(mTextures.length,mTextures,0);
 
@@ -56,11 +58,11 @@ public class GLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        openCVJni = new OpenCVJni(lbpcascade_frontalface.getAbsolutePath(),seeta_fa.getAbsolutePath(),mCameraHelper);
         mCameraHelper.startPreview(mSurfaceTure);
         mCameraHelper.setPreviewCallback(this);
         mCameraFilter.onReady(width,height);
         mScreenFilter.onReady(width,height);
-        openCVJni = new OpenCVJni(lbpcascade_frontalface.getAbsolutePath(),mCameraHelper);
         openCVJni.startrack();
     }
 

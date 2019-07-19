@@ -25,9 +25,9 @@ public class OpenCVJni {
         System.loadLibrary("native-lib");
     }
 
-    public OpenCVJni(String path, CameraHelper cameraHelper) {
+    public OpenCVJni(String path, String seetafa, CameraHelper cameraHelper) {
         mCameraHelper = cameraHelper;
-        faceTraceIndex = native_init(path,"");
+        faceTraceIndex = native_init(path,seetafa);
         mHandlerThread = new HandlerThread("track");
         mHandlerThread.start();
 
