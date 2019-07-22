@@ -72,16 +72,35 @@ Java_com_example_zhangzd_beautymaster_OpenCVJni_native_1detector(JNIEnv *env, jo
 
     //获取人脸关键点信息
     vector<Rect2f> rects = faceTrack->detector(gray);
+    for (Rect face : rects) {
+        rectangle(src, face, Scalar(255, 0, 255));
+    }
 
-    // 反射组装Face对象返回给Java层
-    jclass clazz = env->FindClass("com/example/zhangzd/beautymaster/face/Face");
+    int w=src.cols;
+    int h =src.rows;
+    int ret = rects.size();
 
-
-    src.release();
-    gray.release();
-
-
+    if (ret) {
+        jclass clazz= env->FindClass("com/example/zhangzd/beautymaster/face/Face");
+        jmethodID costruct =env->GetMethodID(clazz, "<init>", "(IIII[F)V");
+        int size = ret * 2;
+        //创建java 的float 数组
+        jfloatArray floatArray = env->NewFloatArray(size);
+        for (int i = 0, j = 0; i < size; j++) {
+            float f[2] = {rects[j].x, rects[j].y};
+            env->SetFloatArrayRegion(floatArray, i, 2, f);
+            i += 2;
+        }
+        Rect2f faceRect = rects[0];
+        int width = faceRect.width;
+        int height = faceRect.height;
+        jobject face = env->NewObject(clazz, costruct, width, height, w, h,
+                                      floatArray);
+        return face;
+    }
 
     env->ReleaseByteArrayElements(data_, data, 0);
     return NULL;
+
+
 }

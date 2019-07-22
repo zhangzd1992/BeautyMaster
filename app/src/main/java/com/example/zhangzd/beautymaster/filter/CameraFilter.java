@@ -33,11 +33,18 @@ public class CameraFilter extends AbstrictFilter {
 //                1.0f,1.0f
 //        };
 
+//        float[] TEXTURE = {
+//                1.0f,0.0f,
+//                1.0f,1.0f,
+//                0.0f,0.0f,
+//                0.0f,1.0f
+//        };
+
         float[] TEXTURE = {
-                1.0f,0.0f,
-                1.0f,1.0f,
-                0.0f,0.0f,
-                0.0f,1.0f
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
         };
         mTextureBuffer.put(TEXTURE);
     }

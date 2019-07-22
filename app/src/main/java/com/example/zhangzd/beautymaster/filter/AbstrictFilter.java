@@ -38,19 +38,21 @@ public abstract class AbstrictFilter {
                 1.0f,1.0f
 
         };
+
+
         mVertexBuffer.put(VERTEX);
 
         mTextureBuffer = ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTextureBuffer.clear();
         float[] FRAGMENT = {
-            0f,0f,
-            1f,0f,
-            0f,1f,
-            1f,1f
-//                0.0f, 1.0f,
-//                1.0f, 1.0f,
-//                0.0f, 0.0f,
-//                1.0f, 0.0f
+//            0f,0f,
+//            1f,0f,
+//            0f,1f,
+//            1f,1f
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                0.0f, 0.0f,
+                1.0f, 0.0f
         };
         mTextureBuffer.put(FRAGMENT);
         initialize(context);

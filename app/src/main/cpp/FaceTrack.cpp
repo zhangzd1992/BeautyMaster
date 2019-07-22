@@ -37,15 +37,16 @@ vector<Rect2f> FaceTrack::detector(Mat src) {
     tracker->process(src);
 //    获取结果
     tracker->getObjects(faces);
+    //关键点定位
+    //保存5个关键点的坐标
+    // 0:左眼  1:右眼  2:鼻头  3:嘴巴左  4:嘴巴右
+    seeta::FacialLandmark points[5];
     if (faces.size()) {
 //        遍历多个人脸  对每一个人眼进行定位   放大
         Rect face = faces[0];
 //        人脸的区域
         rects.push_back(Rect2f(face.x, face.y, face.width, face.height));
-        //关键点定位
-        //保存5个关键点的坐标
-        // 0:左眼  1:右眼  2:鼻头  3:嘴巴左  4:嘴巴右
-        seeta::FacialLandmark points[5];
+
         //图像数据
         seeta::ImageData image_data(src.cols,src.rows);
         image_data.data = src.data;
@@ -62,21 +63,16 @@ vector<Rect2f> FaceTrack::detector(Mat src) {
         for (int i = 0; i < 5; ++i) {
             //把点放入返回的集合
             rects.push_back(Rect2f(points[i].x,points[i].y,0,0));
+            if (i == 0) {
+                LOGE("左眼坐标  x  %ld   y  %ld", points[0].x,points[0].y);
+            }
+            if (i == 1) {
+                LOGE("右眼坐标  x  %ld  y  %ld", points[1].x,points[1].y);
+            }
         }
     }
 
-//    for(int i = 0; rects.size(); i++) {
-//        LOGE("======= %d",rects.pu);
-//    }
-    vector<Rect2f>::iterator it = rects.begin();
-    // vector<int>::const_iterator iter=v.begin();
-    for(; it != rects.end(); ++it)
-    {
-        cout<<(*it)<<" ";
-        LOGE("检测人脸%d%d",(*it).x,(*it).y);
-    }
 
-    LOGE("检测人脸%d",faces.size());
 
     return rects;
 }

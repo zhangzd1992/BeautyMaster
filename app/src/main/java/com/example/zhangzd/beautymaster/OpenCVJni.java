@@ -20,6 +20,7 @@ public class OpenCVJni {
     private HandlerThread mHandlerThread;
     private Handler mHandler;
     private CameraHelper mCameraHelper;
+    private Face mFace;
 
     static {
         System.loadLibrary("native-lib");
@@ -36,7 +37,8 @@ public class OpenCVJni {
             public void handleMessage(Message msg) {
                 if (msg.obj != null) {
                     byte[] data = (byte[]) msg.obj;
-                    native_detector(faceTraceIndex,data,mCameraHelper.getCameraId(),CameraHelper.WIDTH,CameraHelper.HEIGHT);
+                    //返回face对象
+                    mFace = native_detector(faceTraceIndex,data,mCameraHelper.getCameraId(),CameraHelper.WIDTH,CameraHelper.HEIGHT);
                 }
 
             }
@@ -57,6 +59,10 @@ public class OpenCVJni {
         mHandler.sendMessage(message);
     }
 
+
+    public Face getmFace() {
+        return mFace;
+    }
     //初始化
     public native long native_init(String path,String seetPath);
     public native void native_start(long faceTraceIndex);
