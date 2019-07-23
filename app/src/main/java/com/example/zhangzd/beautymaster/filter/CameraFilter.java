@@ -26,20 +26,6 @@ public class CameraFilter extends AbstrictFilter {
     @Override
     protected void initCoordinate() {
         mTextureBuffer.clear();
-//        float[] TEXTURE = {
-//                0.0f,0.0f,
-//                1.0f,0.0f,
-//                0.0f,1.0f,
-//                1.0f,1.0f
-//        };
-
-//        float[] TEXTURE = {
-//                1.0f,0.0f,
-//                1.0f,1.0f,
-//                0.0f,0.0f,
-//                0.0f,1.0f
-//        };
-
         float[] TEXTURE = {
                 0.0f, 0.0f,
                 0.0f, 1.0f,

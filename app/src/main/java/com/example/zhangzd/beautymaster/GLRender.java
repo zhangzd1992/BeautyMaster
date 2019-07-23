@@ -7,6 +7,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Environment;
 
 
+import com.example.zhangzd.beautymaster.filter.BeautyFilter;
 import com.example.zhangzd.beautymaster.filter.BigEyeFilter;
 import com.example.zhangzd.beautymaster.filter.CameraFilter;
 import com.example.zhangzd.beautymaster.filter.ScreenFilter;
@@ -29,6 +30,7 @@ public class GLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
     private ScreenFilter mScreenFilter;
     private BigEyeFilter mBigEyeFilter;
     private StickFilter mStickFilter;
+    private BeautyFilter mBeautyFilter;
     private OpenCVJni openCVJni;
     private int mWidth;
     private int mHeight;
@@ -109,6 +111,10 @@ public class GLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
 
         mStickFilter.setFace(openCVJni.getmFace());
         textureId = mStickFilter.onDrawFrame(textureId);
+
+        if (mBeautyFilter != null) {
+            textureId = mBeautyFilter.onDrawFrame(textureId);
+        }
         //讲最终的特效显示在surfaceview
         mScreenFilter.onDrawFrame(textureId);
     }
@@ -118,5 +124,21 @@ public class GLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
     public void onPreviewFrame(byte[] data, Camera camera) {
         if (openCVJni != null)
             openCVJni.detector(data);
+    }
+
+    public void enableBeauty(final boolean isChecked) {
+
+        mView.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                if (isChecked) {
+                    mBeautyFilter = new BeautyFilter(mView.getContext());
+                    mBeautyFilter.onReady(mWidth,mHeight);
+                }else {
+                    mBeautyFilter = null;
+                }
+            }
+        });
+
     }
 }

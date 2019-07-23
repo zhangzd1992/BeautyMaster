@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
 public class GLView extends GLSurfaceView {
+    private GLRender mRender;
     public GLView(Context context) {
         super(context);
     }
@@ -12,7 +13,12 @@ public class GLView extends GLSurfaceView {
     public GLView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setEGLContextClientVersion(2);
-        setRenderer(new GLRender(this));
+        mRender = new GLRender(this);
+        setRenderer(mRender);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
+    }
+
+    public void enableBeauty(boolean isChecked) {
+        mRender.enableBeauty(isChecked);
     }
 }
